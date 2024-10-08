@@ -6,7 +6,7 @@
     /* Dark Mode Variables */
     --background-color: #0a0a0a;
     --text-color: #3cb371;
-    --banner-bg: #1a1a1a;
+    --banner-bg: #0a0a0a;
     --banner-text: #3cb371;
     --name-part-color: rgba(60, 179, 113, 0.1);
     --middle-name-color: #ff073a;
@@ -14,13 +14,16 @@
     --link-hover-color: #8b0000;
     --footer-bg: #1a1a1a;
     --footer-text: #3cb371;
-    --non-commercial-color: #ff073a;
+    --non-commercial-color: #3cb371;
     --button-bg: #3cb371;
     --button-text: #1a1a1a;
     --button-border: #8b0000;
     --button-hover-bg: #8b0000;
     --button-hover-text: #3cb371;
     --blockquote-border: #3cb371;
+
+     /* New Variable for Dropdown Background in Dark Mode */
+    --dropdown-bg-color: #0a0a0a;
 }
 
 .light-mode {
@@ -32,16 +35,19 @@
     --name-part-color: rgba(0, 0, 0, 0.5);
     --middle-name-color: #000000;
     --link-color: #000000;
-    --link-hover-color: #000000;
+    --link-hover-color: #555555; /* Adjusted for visibility */
     --footer-bg: #ffffff;
     --footer-text: #000000;
     --non-commercial-color: #000000;
     --button-bg: #000000;
     --button-text: #ffffff;
     --button-border: #000000;
-    --button-hover-bg: #000000;
+    --button-hover-bg: #555555; /* Adjusted for visibility */
     --button-hover-text: #ffffff;
     --blockquote-border: #000000;
+
+     /* New Variable for Dropdown Background in Light Mode */
+    --dropdown-bg-color: #ffffff;
 }
 
 /* General Styles */
@@ -50,18 +56,20 @@ html, body {
     margin: 0;
     padding: 0;
     font-family: 'Press Start 2P', cursive;
-    background-color: var(--background-color);
     color: var(--text-color);
     overflow-x: hidden;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-    position: relative;
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-color);
+    z-index: -2; /* Positioned behind the stars */
 }
-
-
 
 /* --- Star Styles --- */
 
@@ -73,7 +81,7 @@ body:not(.light-mode) .star-container {
     top: 0;
     left: 0;
     overflow: hidden;
-    z-index: -1; /* Positioned behind content but above background */
+    z-index: 0; /* Positioned behind content but above background */
     pointer-events: none;
 }
 
@@ -252,6 +260,7 @@ body:not(.light-mode) .asteroid2 {
 }
 
 /* Navigation Styles */
+
 .container {
     display: flex;
     flex: 1;
@@ -264,6 +273,7 @@ nav {
     z-index: 1; /* Above stars */
 }
 
+
 nav ul {
     list-style-type: none;
     padding: 0 20px;
@@ -272,35 +282,70 @@ nav ul {
 
 nav ul li {
     margin-bottom: 20px;
+    position: relative;
 }
 
 nav ul li a {
     color: var(--link-color);
     text-decoration: none;
     font-size: 16px;
-    position: relative;
     display: block;
     transition: color 0.3s ease;
-}
-
-nav ul li a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    background: #8b0000;
-    left: 0;
-    bottom: -5px;
-    transition: width 0.3s ease;
 }
 
 nav ul li a:hover {
     color: var(--link-hover-color);
 }
 
-nav ul li a:hover::after {
-    width: 100%;
+/* Add Positioning to Dropdown Parent */
+nav ul li.dropdown {
+    position: relative; /* Added */
 }
+
+/* Ensure the parent li has position: relative */
+nav ul li.dropdown {
+    position: relative; /* Added if not already present */
+}
+
+/* Dropdown Menu Styles */
+nav ul li .dropdown-menu {
+    display: block; /* Always block to occupy space */
+    background-color: var(--dropdown-bg-color); /* Dynamic background */
+    min-width: 160px; /* Set a minimum width */
+    border-radius: 4px; /* Rounded corners */
+    list-style: none; /* Remove default list styling */
+    padding: 0; /* Reset padding */
+    margin: 0; /* Reset margin */
+    opacity: 0; /* Fully transparent initially */
+    max-height: 0; /* Collapsed state */
+    overflow: hidden; /* Hide overflowing content */
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out; /* Smooth transitions */
+}
+
+/* Show dropdown on hover */
+nav ul li.dropdown:hover > .dropdown-menu {
+    opacity: 1; /* Fully opaque */
+    max-height: 500px; /* Expand to show dropdown items */
+
+}
+
+/* Enhance Dropdown Links */
+nav ul li .dropdown-menu li a {
+    display: block; /* Make the links block-level for full clickable area */
+    padding: 5px 5px; /* Add padding for better spacing */
+    color: var(--link-color); /* Use the defined link color */
+    text-decoration: none; /* Remove underline */
+    font-size: 14px; /* Maintain consistency with existing styles */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+}
+
+nav ul li .dropdown-menu li a:hover {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+}
+
+
+
 
 /* Main Content Styles */
 main {
@@ -318,12 +363,12 @@ section {
 section#home,
 section#about,
 #quotes {
-    background-color: rgba(26, 26, 26, 0.85); /* Slightly transparent */
+    background-color: rgba(0, 0, 0, 0.689); /* Slightly transparent */
     margin: 10px auto;
     max-width: 1000px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(60, 179, 113, 0.3);
-    padding: 30px 25px;
+    padding: 20px 25px;
 }
 
 .light-mode section#home,
@@ -384,10 +429,6 @@ blockquote {
     border-left: 4px solid var(--blockquote-border);
     padding-left: 15px;
     margin: 0;
-}
-
-.light-mode blockquote {
-    border-left: 4px solid var(--blockquote-border);
 }
 
 /* Footer Styles */
@@ -472,6 +513,10 @@ footer p.non-commercial {
         height: 50px;
     }
 
+    .container {
+        flex-direction: column;
+    }
+
     nav {
         width: 100%;
         position: relative;
@@ -479,11 +524,16 @@ footer p.non-commercial {
 
     nav ul {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-around;
     }
 
     nav ul li {
-        margin: 0;
+        margin: 5px;
+    }
+
+    nav ul li .dropdown-menu {
+        margin-top: 10px;
     }
 
     main {
