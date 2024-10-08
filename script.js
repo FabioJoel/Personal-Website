@@ -4,6 +4,10 @@ const sunIcon = document.getElementById('sun-icon');
 const moonIcon = document.getElementById('moon-icon');
 const body = document.body;
 
+// Select the audio toggle button and audio player
+const audioToggle = document.getElementById('audio-toggle');
+const audioPlayer = document.getElementById('audio-player');
+
 // Function to generate stars
 function generateStars() {
     const starContainer = document.querySelector('.star-container');
@@ -85,8 +89,32 @@ function toggleTheme() {
     }
 }
 
-// Event listener for the toggle button
+// Function to toggle audio play/pause
+function toggleAudio() {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        // Change to Pause Icon
+        audioToggle.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+        `;
+    } else {
+        audioPlayer.pause();
+        // Change back to Play Icon
+        audioToggle.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+            </svg>
+        `;
+    }
+}
+
+// Event listener for the theme toggle button
 themeToggle.addEventListener('click', toggleTheme);
+
+// Event listener for the audio toggle button
+audioToggle.addEventListener('click', toggleAudio);
 
 // Check for saved user preference, if any, on initial load
 const savedTheme = localStorage.getItem('theme');
@@ -116,5 +144,3 @@ if (savedTheme === 'light') {
         asteroidContainer.style.display = 'block';
     }
 }
-
-//TEST

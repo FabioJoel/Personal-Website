@@ -22,8 +22,11 @@
     --button-hover-text: #3cb371;
     --blockquote-border: #3cb371;
 
-     /* New Variable for Dropdown Background in Dark Mode */
+    /* New Variable for Dropdown Background in Dark Mode */
     --dropdown-bg-color: #0a0a0a;
+
+    /* New Variable for Red Glow in Dark Mode */
+    --dropdown-link-glow: 0 0 10px rgba(255, 0, 0, 0.7); /* Red glow */
 }
 
 .light-mode {
@@ -46,7 +49,7 @@
     --button-hover-text: #ffffff;
     --blockquote-border: #000000;
 
-     /* New Variable for Dropdown Background in Light Mode */
+    /* New Variable for Dropdown Background in Light Mode */
     --dropdown-bg-color: #ffffff;
 }
 
@@ -259,6 +262,75 @@ body:not(.light-mode) .asteroid2 {
     text-shadow: none;
 }
 
+
+/* 1. Container for Header Buttons */
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between buttons */
+}
+
+/* 2. Common Styles for Both Buttons */
+.audio-button, .theme-button {
+    background: none; /* Transparent background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor on hover */
+    color: var(--banner-text); /* Consistent text color */
+    transition: color 0.3s ease; /* Smooth color transition */
+    padding: 0; /* Remove default padding */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Remove any extra margins */
+.audio-button, .theme-button {
+    margin: 0;
+}
+
+/* Ensure SVG icons are vertically centered */
+.audio-button svg, .theme-button svg {
+    vertical-align: middle;
+}
+
+/* 3. Adjust Music Note Icon Size to 19px (20% smaller) */
+.audio-button svg {
+    width: 16px; /* Reduced from 24px */
+    height: 16px; /* Reduced from 24px */
+}
+
+/* Adjust Music Note SVG Position */
+.audio-button svg {
+    transform: translateY(-1px); /* Move SVG up by 2px */
+}
+
+
+
+/* 4. Keep Theme Button Icon at 24px */
+.theme-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 5. Hover Effects */
+.audio-button:hover, .theme-button:hover {
+    color: var(--link-hover-color); /* Change color on hover */
+}
+
+/* 6. Remove focus outline for better aesthetics */
+.audio-button:focus, .theme-button:focus {
+    outline: none;
+}
+
+/* 7. Name Parts Styles */
+.name-part {
+    color: var(--name-part-color);
+    transition: color 0.3s ease;
+    text-decoration: none; /* Remove underline if it's a link */
+}
+
+
+
 /* Navigation Styles */
 
 .container {
@@ -273,15 +345,17 @@ nav {
     z-index: 1; /* Above stars */
 }
 
-
 nav ul {
     list-style-type: none;
     padding: 0 20px;
     margin: 0;
+    display: flex;
+    flex-direction: column; /* Stack navigation items vertically */
+    gap: 20px; /* Increased spacing between items */
 }
 
 nav ul li {
-    margin-bottom: 20px;
+    margin-bottom: 0; /* Reset margin to use gap */
     position: relative;
 }
 
@@ -297,20 +371,14 @@ nav ul li a:hover {
     color: var(--link-hover-color);
 }
 
-/* Add Positioning to Dropdown Parent */
+/* Dropdown Parent - Reset Positioning */
 nav ul li.dropdown {
-    position: relative; /* Added */
-}
-
-/* Ensure the parent li has position: relative */
-nav ul li.dropdown {
-    position: relative; /* Added if not already present */
+    position: static; /* Ensure it's part of the normal flow */
 }
 
 /* Dropdown Menu Styles */
 nav ul li .dropdown-menu {
     display: block; /* Always block to occupy space */
-    background-color: var(--dropdown-bg-color); /* Dynamic background */
     min-width: 160px; /* Set a minimum width */
     border-radius: 4px; /* Rounded corners */
     list-style: none; /* Remove default list styling */
@@ -320,38 +388,93 @@ nav ul li .dropdown-menu {
     max-height: 0; /* Collapsed state */
     overflow: hidden; /* Hide overflowing content */
     transition: max-height 0.3s ease-out, opacity 0.3s ease-out; /* Smooth transitions */
+    z-index: 1000; /* Ensure it appears above other elements */
+}
+
+
+/* Add space before the first dropdown item */
+nav ul li .dropdown-menu li:first-child a {
+    margin-top: 10px; /* Increase space as desired */
 }
 
 /* Show dropdown on hover */
 nav ul li.dropdown:hover > .dropdown-menu {
     opacity: 1; /* Fully opaque */
     max-height: 500px; /* Expand to show dropdown items */
-
 }
 
 /* Enhance Dropdown Links */
 nav ul li .dropdown-menu li a {
-    display: block; /* Make the links block-level for full clickable area */
-    padding: 5px 5px; /* Add padding for better spacing */
-    color: var(--link-color); /* Use the defined link color */
+    display: block; /* Full clickable area */
+    padding: 10px 20px; /* Increased padding for better spacing */
     text-decoration: none; /* Remove underline */
-    font-size: 14px; /* Maintain consistency with existing styles */
+    font-size: 14px; /* Consistent font size */
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
 }
 
-nav ul li .dropdown-menu li a:hover {
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
+/* Define CSS Variables for Dark and Light Modes */
+:root {
+    /* Dark Mode Variables */
+    --name-part-color: rgba(60, 179, 113, 0.5); /* Dimmed color */
+    --middle-name-color: #ff073a; /* Neon color */
+    /* ... other variables ... */
+}
+
+.light-mode {
+    /* Light Mode Variables */
+    --name-part-color: rgba(0, 0, 0, 0.5); /* Dimmed color */
+    --middle-name-color: #000000; /* Neon color */
+    /* ... other variables ... */
+}
+
+/* Apply to .name-part */
+.name-part {
+    color: var(--name-part-color);
+    transition: color 0.3s ease;
+    text-decoration: none; /* Remove underline if it's a link */
+}
+
+/* General Hover Effects for .name-part */
+.name-part:hover,
+.name-part:focus {
+    color: var(--banner-text);
+    text-shadow: 0 0 10px var(--banner-text), 0 0 20px var(--banner-text);
+    outline: none;
+}
+
+/* Specific Override for Dropdown Links in Light Mode */
+.light-mode nav ul li .dropdown-menu li a.name-part:hover,
+.light-mode nav ul li .dropdown-menu li a.name-part:focus {
+    text-shadow: none; /* Removes glow effect */
+    color: var(--middle-name-color); /* Optional: Change color without glow */
+    outline: none;
+}
+
+/* Ensure No Background or Border on Hover */
+.name-part:hover {
+    background: none;
+    border: none;
 }
 
 
-
+/* Light Mode: Dropdown Links Hover Effects */
+.light-mode nav ul li .dropdown-menu li a:hover,
+.light-mode nav ul li .dropdown-menu li a:focus {
+    color: var(--middle-name-color); /* For example, applying a distinct color */
+    text-shadow: 0 0 5px var(--middle-name-color), 0 0 10px var(--middle-name-color);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
 
 /* Main Content Styles */
 main {
-    flex: 1;
-    padding: 40px 20px;
-    z-index: 1; /* Above stars */
+    font-family: 'Silkscreen', cursive;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-color);
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
 }
 
 section {
@@ -556,5 +679,3 @@ footer p.non-commercial {
 html {
     scroll-behavior: smooth;
 }
-
-/*test*/
