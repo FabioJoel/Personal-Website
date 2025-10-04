@@ -7,6 +7,12 @@
     <meta name="color-scheme" content="dark light">
     <style>
       html,body,#root { height: 100%; margin: 0; background:#0b0b0b; }
+
+      /* Button reset and accessible focus */
+      button { -webkit-appearance:none; appearance:none; border:0; background:transparent; color:inherit; font:inherit; }
+      button:focus { outline:none; }
+      button:focus-visible { outline:2px solid #2a2a2a; outline-offset:2px; border-radius:8px; }
+      button::-moz-focus-inner { border:0; }
     </style>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -503,8 +509,8 @@
               </svg>
               <div style={{display:'flex',alignItems:'center',gap:12,marginTop:12,flexWrap:'wrap'}}>
                 <div style={{display:'inline-flex',border:'1px solid #1f1f1f',borderRadius:10,overflow:'hidden'}}>
-                  <button onClick={()=>setRegime('lvt')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='lvt'?'#1a1a1a':'transparent',color:'#cfcfcf'}}>LVT</button>
-                  <button onClick={()=>setRegime('prop')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='prop'?'#1a1a1a' : 'transparent',color:'#cfcfcf'}}>property tax</button>
+                  <button onClick={()=>setRegime('lvt')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='lvt'?'#1a1a1a':'transparent',color:'#cfcfcf',cursor:'pointer',border:'none',outline:'none'}}>LVT</button>
+                  <button onClick={()=>setRegime('prop')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='prop'?'#1a1a1a' : 'transparent',color:'#cfcfcf',cursor:'pointer',border:'none',outline:'none'}}>property tax</button>
                 </div>
                 <span className="mono dim" style={{fontSize:12}}>tax</span>
                 <input className="slider" type="range" min={0} max={40} step={2} value={tax} onChange={e=> setTax(parseInt(e.target.value,10))} />
