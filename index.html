@@ -5,74 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>joel</title>
     <meta name="color-scheme" content="dark light">
-    <style>
-      html,body,#root { height: 100%; margin: 0; background:#0b0b0b; }
-
-      /* Button reset and accessible focus */
-      button { -webkit-appearance:none; appearance:none; border:0; background:transparent; color:inherit; font:inherit; }
-      button:focus { outline:none; }
-      button:focus-visible { outline:2px solid #2a2a2a; outline-offset:2px; border-radius:8px; }
-      button::-moz-focus-inner { border:0; }
-    </style>
+    <style>html,body,#root{height:100%;margin:0}</style>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
   <body>
     <div id="root"></div>
+
     <script type="text/babel" data-presets="react">
       function App() {
         const [route, setRoute] = React.useState("home");
         const [reader, setReader] = React.useState(null);
+        const [theme, setTheme] = React.useState('mint'); // default: mint
+
+        React.useEffect(()=>{ document.title = "joel"; }, []);
+
+        // --- URL state (hash) ---
+        const buildHash = (r, rd) => {
+          if (r === 'writings' && rd) {
+            if (rd.type === 'series') return '#/writings/series/' + rd.seriesIndex + '/' + rd.partIndex;
+            if (rd.type === 'single') return '#/writings/single/' + rd.index;
+          }
+          return '#/' + r;
+        };
+        const parseHash = (h) => {
+          const trimmed = h ? h.replace(/^#/, '') : '/home';
+          const seg = trimmed.split('/').filter(Boolean);
+          const rCand = seg[0];
+          const r = (rCand==='home'||rCand==='reading'||rCand==='writings'||rCand==='about') ? rCand : 'home';
+          if (r==='writings' && seg[1]==='series' && seg.length>=4) {
+            const si = parseInt(seg[2],10); const pi = parseInt(seg[3],10);
+            const s = content.series[si]; const p = s && s.parts[pi];
+            if (s && p) return { route:'writings', reader:{ type:'series', series:s.title, seriesIndex:si, partIndex:pi, title:p.t, date:p.d, blurb:p.s } };
+          }
+          if (r==='writings' && seg[1]==='single' && seg.length>=3) {
+            const idx = parseInt(seg[2],10); const p = content.singles[idx];
+            if (p) return { route:'writings', reader:{ type:'single', index:idx, title:p.t, date:p.d, blurb:p.s } };
+          }
+          return { route:r, reader:null };
+        };
+        React.useEffect(()=>{
+          const apply = ()=>{
+            const st = parseHash(window.location.hash);
+            setRoute(st.route);
+            setReader(st.reader);
+          };
+          apply();
+          const onHash = ()=> apply();
+          window.addEventListener('hashchange', onHash);
+          return ()=> window.removeEventListener('hashchange', onHash);
+        }, []);
+        React.useEffect(()=>{
+          const next = buildHash(route, reader);
+          if (window.location.hash !== next) window.location.hash = next;
+        }, [route, reader]);
 
         const content = {
           series: [
             {
-              title: 'Reihe Geld',
-              blurb: 'does money matter, or do real goods drive outcomes?',
+              title: "Reihe Geld",
+              blurb: "does money matter, or do real goods drive outcomes?",
               parts: [
-                { t: 'Über die Makute', d: '2025-06-01', s: 'Montesquieu, gedachte Einheiten, Fama, Modigliani–Miller.' },
-                { t: 'Kann Free Banking funktionieren?', d: '2025-06-15', s: 'Praktikabilität, Stabilität, Clearing.' },
-                { t: 'Was ist Geld?', d: '2025-07-01', s: 'Mehrere Linsen; Cochrane; wann sind Krypto-Assets Geld?' },
-                { t: 'Cryptowährungen', d: '2025-07-20', s: 'Design, Geldähnlichkeit, Friktionen.' }
+                { t: "Über die Makute", d: "2025-06-01", s: "Montesquieu, gedachte Einheiten, Fama, Modigliani–Miller." },
+                { t: "Kann Free Banking funktionieren?", d: "2025-06-15", s: "Praktikabilität, Stabilität, Clearing." },
+                { t: "Was ist Geld?", d: "2025-07-01", s: "Mehrere Linsen; Cochrane; wann sind Krypto-Assets Geld?" },
+                { t: "Cryptowährungen", d: "2025-07-20", s: "Design, Geldähnlichkeit, Friktionen." }
               ]
             },
             {
-              title: 'Reihe Eigentum',
-              blurb: 'Eigentum als Fundament: Rechtfertigung, Grenzen, Enteignung.',
+              title: "Reihe Eigentum",
+              blurb: "Eigentum als Fundament: Rechtfertigung, Grenzen, Enteignung.",
               parts: [
-                { t: 'Rechtfertigung und Ursprung', d: '2025-08-05', s: 'Locke vs Hume; Naturrecht vs Konvention.' },
-                { t: 'Grenzen, Enteignung, Ausschließbarkeit', d: '2025-08-19', s: 'Temporale & Spezies-Ungerechtigkeiten; Trespassing.' },
-                { t: 'Wem gehört der Mond?', d: '2025-09-02', s: 'Anspruch, Durchsetzung, Legitimität in neuen Räumen.' }
+                { t: "Rechtfertigung und Ursprung", d: "2025-08-05", s: "Locke vs Hume; Naturrecht vs Konvention." },
+                { t: "Grenzen, Enteignung, Ausschließbarkeit", d: "2025-08-19", s: "Temporale & Spezies-Ungerechtigkeiten; Trespassing." },
+                { t: "Wem gehört der Mond?", d: "2025-09-02", s: "Anspruch, Durchsetzung, Legitimität in neuen Räumen." }
               ]
             }
           ],
           singles: [
-            { t: 'Langfristige Investition, Wachstum & Erhaltung', d: '2025-05-10', s: 'Infrastruktur, Wartung, Kapitalstock.' }
+            { t: "Langfristige Investition, Wachstum & Erhaltung", d: "2025-05-10", s: "Infrastruktur, Wartung, Kapitalstock." }
           ]
         };
 
         const openReader = (payload) => {
-          if (payload && payload.type === 'series') {
+          if (payload && payload.type === "series") {
             const s = content.series[payload.seriesIndex];
             if (!s) return;
             const p = s.parts[payload.partIndex];
             if (!p) return;
             setReader({
-              type: 'series',
+              type: "series",
               series: s.title,
               seriesIndex: payload.seriesIndex,
               partIndex: payload.partIndex,
               title: p.t,
               date: p.d,
-              blurb: p.s
+              blurb: p.s,
             });
             return;
           }
-          if (payload && payload.type === 'single') {
+          if (payload && payload.type === "single") {
             const p = content.singles[payload.index];
             if (!p) return;
-            setReader({ type: 'single', index: payload.index, title: p.t, date: p.d, blurb: p.s });
+            setReader({ type: "single", index: payload.index, title: p.t, date: p.d, blurb: p.s });
             return;
           }
           if (payload && payload.title) {
@@ -80,53 +116,75 @@
           }
         };
 
+        const css = `
+          html, body, #root { height: 100%; margin: 0; background:var(--bg); }
+          :root { color-scheme: dark; }
+          .theme-dark { --bg:#000; --text:#e5e5e5; --dim:#9ca3af; --border:#121212; --card-bg:#060606; --nav-bg: rgba(0,0,0,0.5); --footer-border:#0a0a0a; --slider-track:#0a0a0a; --slider-hover:#141414; --thumb-bg:#8a8a8a; --thumb-border:#1a1a1a; --toggle-active:#1a1a1a; --axis:#101010; --demand:#9e9e9e; --supply:#8f8f8f; --supply-tax:#8a9199; --wedge:#b98a1e; --grid:#1a1a1a; --point:#bdbdbd; --label:#9ca3af; --dwl-bg:#5c2f2f; --dwl-stroke:#c28a8a; --dwl-stroke-opacity:0.35; --dwl-bg-opacity:0.10; --chip-bg:#0a0a0a; }
+          .theme-mint { --bg:#061a16; --text:#e5e5e5; --dim:#9dcab9; --border:#14352e; --card-bg:#0b221d; --nav-bg: rgba(6,26,22,0.55); --footer-border:#14352e; --slider-track:#13332b; --slider-hover:#184038; --thumb-bg:#a9e9d4; --thumb-border:#1f5a4e; --toggle-active:#163a33; --axis:#14352e; --demand:#aeead8; --supply:#7fd1b7; --supply-tax:#9dcab9; --wedge:#30d5b0; --grid:#1a1a3e36; --point:#cfeee4; --label:#9dcab9; --dwl-bg:#19473e; --dwl-stroke:#82d9c2; --dwl-stroke-opacity:0.30; --dwl-bg-opacity:0.12; --chip-bg:#102e28; }
+          button { -webkit-appearance:none; appearance:none; border:0; background:transparent; color:inherit; font:inherit; }
+          button:focus { outline:none; }
+          button:focus-visible { outline:2px solid #2a2a2a; outline-offset:2px; border-radius:8px; }
+          a { color: inherit; }
+          .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+          .nav { position: sticky; top: 0; background: var(--nav-bg); backdrop-filter: saturate(1.1) blur(10px) contrast(0.95); border-bottom: 1px solid var(--footer-border); z-index: 10; }
+          .nav-inner { height: 64px; display: flex; align-items: center; justify-content: space-between; }
+          .title { font-weight: 700; letter-spacing: -0.02em; }
+          .title.joel { position: relative; display: inline-flex; align-items: flex-end; gap: 0; color: #e5e5e5; line-height: 1; letter-spacing: -0.02em; cursor:pointer; }
+          .j-pad { display:inline-block; width:0.12em; }
+          .logo { display:inline-flex; align-items:flex-end; margin-right:-0.30em; transform: translateY(0.20em); }
+          .logo svg { height:1.05em; width:auto; display:block; overflow:visible; }
+          .logo-oel { display:inline-block; margin-left:-0.26em; }
+          .logo-dot { transition: transform .25s cubic-bezier(.2,.7,.2,1.2); transform-origin:center; }
+          .title.joel:hover .logo-dot { transform: translateY(-15%); }
+          .tabs { display: flex; gap: 16px; }
+          .tab { padding: 8px 0; border: none; border-radius: 0; background: transparent; color: #bbb; font-size: 13px; cursor: pointer; }
+          .tab:hover { color: #fff; }
+          .tab.active { color: #fff; }
+          .main { padding-top: 28px; padding-bottom: 72px; }
+          h1 { font-size: 52px; line-height: 1.05; margin: 0 0 12px 0; letter-spacing: -0.02em; }
+          h2 { font-size: 28px; margin: 0 0 12px 0; }
+          p { margin: 12px 0; color: #c9c9c9; }
+          .dim { color: var(--dim); }
+          .list { display: grid; gap: 12px; }
+          .card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--card-bg); }
+          .link { text-decoration: underline; text-underline-offset: 3px; }
+          .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .02em }
+          .slider { -webkit-appearance: none; appearance: none; height: 2px; width: 220px; background: var(--slider-track); border-radius: 2px; outline: none; }
+          .slider:hover { background: var(--slider-hover); }
+          .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--thumb-bg); border: 1px solid var(--thumb-border); box-shadow: none; transition: background .2s, transform .1s; }
+          .slider:hover::-webkit-slider-thumb { filter: brightness(1.1); }
+          .slider:active::-webkit-slider-thumb { transform: scale(1.05); }
+          /* Scroll cue and reveal */
+          .scroll-cue { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--dim); font-size:12px; opacity:.85; margin: 18px 0 12px; }
+          .chev { display:inline-block; }
+          @keyframes bob { 0%{ transform: translateY(0);} 50%{ transform: translateY(4px);} 100%{ transform: translateY(0);} }
+          .chev svg { animation: bob 1.8s ease-in-out infinite; }
+          .reveal { opacity:0; transform: translateY(24px); transition: opacity 1.2s ease, transform 1.2s ease; transition-delay: .15s; }
+          .reveal.visible { opacity:1; transform:none; }
+        `;
+
+        React.useEffect(() => {
+          const items = [];
+          content.series.forEach((s, si)=> s.parts.forEach((p, pi)=> items.push({kind:"series", seriesIndex:si, partIndex:pi, title:p.t, date:p.d})));
+          content.singles.forEach((p,i)=> items.push({kind:"single", index:i, title:p.t, date:p.d}));
+          const sorted = [...items].sort((a,b)=> +new Date(b.date) - +new Date(a.date));
+          console.assert(sorted.every((it,idx)=> idx===0 || +new Date(sorted[idx-1].date) >= +new Date(it.date)), "items date-desc");
+        }, [route]);
+
         return (
-          <div style={{ minHeight: "100vh", background: "#0b0b0b", color: "#e5e5e5", fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif" }}>
-            <style>{`
-              a { color: inherit; }
-              .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
-              .nav { position: sticky; top: 0; background: rgba(0,0,0,0.75); backdrop-filter: saturate(1.2) blur(6px); border-bottom: none; z-index: 10; }
-              .nav-inner { height: 64px; display: flex; align-items: center; justify-content: space-between; }
-              .title { font-weight: 700; letter-spacing: -0.02em; }
-              .title.joel { position: relative; display: inline-flex; align-items: flex-end; gap: 0; color: #e5e5e5; line-height: 1; letter-spacing: -0.02em; }
-              .j-pad { display:inline-block; width:0.12em; }
-              .logo { display:inline-flex; align-items:flex-end; margin-right:-0.30em; transform: translateY(0.20em); }
-              .logo svg { height:1.05em; width:auto; display:block; overflow:visible; }
-              .logo-oel { display:inline-block; margin-left:-0.26em; }
-              .logo-dot { transition: transform .25s cubic-bezier(.2,.7,.2,1.2); transform-origin:center; }
-              .title.joel:hover .logo-dot { transform: translateY(-15%); }
-              .tabs { display: flex; gap: 16px; }
-              .tab { padding: 8px 0; border: none; border-radius: 0; background: transparent; color: #bbb; font-size: 13px; cursor: pointer; }
-              .tab:hover { color: #fff; }
-              .tab.active { color: #fff; }
-              .main { padding-top: 28px; padding-bottom: 40px; }
-              h1 { font-size: 52px; line-height: 1.05; margin: 0 0 12px 0; letter-spacing: -0.02em; }
-              h2 { font-size: 28px; margin: 0 0 12px 0; }
-              p { margin: 12px 0; color: #c9c9c9; }
-              .dim { color: #9ca3af; }
-              .list { display: grid; gap: 12px; }
-              .card { border: 1px solid #1f1f1f; border-radius: 12px; padding: 14px 16px; background: #0f0f0f; }
-              .link { text-decoration: underline; text-underline-offset: 3px; }
-              .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .02em }
-              .slider { -webkit-appearance: none; appearance: none; height: 2px; width: 220px; background: #1f1f1f; border-radius: 2px; outline: none; }
-              .slider:hover { background: #262626; }
-              .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #8a8a8a; border: 1px solid #2a2a2a; box-shadow: none; transition: background .2s, transform .1s; }
-              .slider:hover::-webkit-slider-thumb { background: #bdbdbd; }
-              .slider:active::-webkit-slider-thumb { transform: scale(1.05); }
-              .slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #8a8a8a; border: 1px solid #2a2a2a; }
-              .slider::-ms-thumb { width: 12px; height: 12px; border-radius: 50%; background: #8a8a8a; border: 1px solid #2a2a2a; }
-              footer{
-  border-top:1px solid #1f1f1f;              /* softer line on dark bg */
-  padding:20px 0 calc(56px + env(safe-area-inset-bottom)); /* more breathing room incl. iOS safe area */
-  margin-top:40px;                            /* more gap above footer */
-  color:#9ca3af;                              /* dimmer text */
-  font-size:13px;
-} }
-            `}</style>
+          <div className={theme==='mint' ? 'theme-mint' : 'theme-dark'} style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif" }}>
+            <style>{css}</style>
 
             <div className="nav">
               <div className="wrap nav-inner">
-                <div className="title joel" aria-label="joel">
+                <div
+                  className="title joel"
+                  aria-label="joel"
+                  onClick={()=> setTheme(t=> t==='dark'?'mint':'dark')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); setTheme(t=> t==='dark'?'mint':'dark'); }}}
+                >
                   <span className="j-pad" aria-hidden="true">&nbsp;</span>
                   <span className="logo" aria-hidden="true">
                     <svg viewBox="0 0 24 24" role="img" aria-label="j">
@@ -149,15 +207,30 @@
             {route === 'writings' && (reader ? <ReaderView data={reader} content={content} onClose={()=>setReader(null)} onOpen={openReader} /> : <Writings onOpen={openReader} content={content} />)}
             {route === 'about' && <About />}
 
-            <footer className="wrap">© {new Date().getFullYear()} joel — site is a work in progress :)</footer>
+            <footer className="wrap" style={{ borderTop: '1px solid var(--footer-border)', color: 'var(--dim)', padding: '28px 0 96px', marginTop: 48, lineHeight: 1.5, fontSize: 12 }}>
+              © {new Date().getFullYear()} joel — site is a work in progress :)
+            </footer>
           </div>
         );
       }
 
       function Home(){
+        const [visible, setVisible] = React.useState(false);
+        const chartRef = React.useRef(null);
+
+        React.useEffect(()=>{
+          const el = chartRef.current;
+          if (!el) return;
+          const io = new IntersectionObserver((entries)=>{
+            entries.forEach(e=>{ if(e.isIntersecting){ setVisible(true); }});
+          }, { rootMargin: '0px 0px -10% 0px', threshold: 0.35 });
+          io.observe(el);
+          return ()=> io.disconnect();
+        }, []);
+
         return (
           <>
-            <main className="wrap main">
+            <main className="wrap main" style={{minHeight:'75vh'}}>
               <h1>hi.</h1>
               <p>i'm joel.</p>
               <p>i study law & economics (and a little philosophy).</p>
@@ -165,9 +238,15 @@
               <p>here, i explore ideas in different fields and share what interests me.</p>
               <p className="dim">you can find me on <a className="link" href="https://x.com/foenus" target="_blank" rel="noreferrer">x</a>.</p>
               <Note>note: this site is new. i'll keep adding little essays and project notes.</Note>
-              <div style={{marginTop:28}}></div>
+              <div className="scroll-cue">
+                <span className="chev" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="var(--dim)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+              </div>
             </main>
-            <LandTaxChartDemo />
+            <div ref={chartRef} className={`reveal ${visible ? 'visible' : ''}`} style={{marginTop: 0}}>
+              <LandTaxChartDemo />
+            </div>
           </>
         );
       }
@@ -198,7 +277,7 @@
                 </div>
                 <div className="list" style={{marginTop:8}}>
                   {placeholders.map((ph,i)=> (
-                    <div key={i} style={{border:'1px dashed #2a2a2a',borderRadius:10,padding:'10px 12px',background:'#0b0b0b'}}>
+                    <div key={i} style={{border:'1px dashed var(--border)',borderRadius:10,padding:'10px 12px',background:'var(--card-bg)'}}>
                       <div style={{display:'flex',justifyContent:'space-between',gap:8}}>
                         <span style={{opacity:.9}}>add paper #{i+1}</span>
                         <span className="mono dim" style={{fontSize:12}}>{ph.hint}</span>
@@ -214,7 +293,7 @@
                 </div>
                 <div style={{display:'flex',flexWrap:'wrap',gap:8,marginTop:8}}>
                   {themes.map((t,i)=> (
-                    <span key={i} className="mono" style={{fontSize:12,padding:'6px 8px',border:'1px solid #1f1f1f',borderRadius:8,background:'#0b0b0b'}}>{t}</span>
+                    <span key={i} className="mono" style={{fontSize:12,padding:'6px 8px',border:'1px solid var(--border)',borderRadius:8,background:'var(--chip-bg)'}}>{t}</span>
                   ))}
                 </div>
               </div>
@@ -248,15 +327,15 @@
           const items = [];
           series.forEach((s, si) => {
             s.parts.forEach((p, pi) => {
-              items.push({ kind:'series', seriesIndex: si, partIndex: pi, title: p.t, date: p.d, seriesTitle: s.title });
+              items.push({ kind:'series', seriesIndex: si, partIndex: pi, title: p.t, date: p.d });
             });
           });
-          singles.forEach((p, i) => items.push({ kind:'single', index: i, title: p.t, date: p.d, seriesTitle: 'single' }));
-          return items.sort((a,b)=> new Date(b.date) - new Date(a.date));
+          singles.forEach((p, i) => items.push({ kind:'single', index: i, title: p.t, date: p.d }));
+          return items.sort((a,b)=> +new Date(b.date) - +new Date(a.date));
         }, [series, singles]);
 
         const Chevron = ({open}) => (
-          <svg width="16" height="16" viewBox="0 0 24 24" style={{transform: open?'rotate(90deg)':'rotate(0deg)', transition:'transform .15s ease'}} aria-hidden="true"><path d="M8 5l8 7-8 7" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" style={{transform: open?'rotate(90deg)':'rotate(0deg)', transition:'transform .15s ease'}} aria-hidden="true"><path d="M8 5l8 7-8 7" fill="none" stroke="var(--supply-tax)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
         );
 
         const Stats = () => {
@@ -287,7 +366,7 @@
                   </div>
                   <div className="list" style={{marginTop:8}}>
                     {series.map((s,i)=> (
-                      <div key={i} style={{border:'1px solid #1f1f1f',borderRadius:10,background:'#0f0f0f'}}>
+                      <div key={i} style={{border:'1px solid var(--border)',borderRadius:10,background:'var(--card-bg)'}}>
                         <button onClick={()=>toggleSeries(i)} aria-expanded={!!openSeries[i]} style={{width:'100%',textAlign:'left',padding:'12px 12px',background:'transparent',border:'none',display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer'}}>
                           <div>
                             <div style={{fontWeight:600}}>{s.title}</div>
@@ -298,7 +377,7 @@
                         {openSeries[i] && (
                           <div className="list" style={{padding:'0 12px 12px 12px'}}>
                             {s.parts.map((p,j)=> (
-                              <div key={j} style={{border:'1px solid #1f1f1f',borderRadius:8}}>
+                              <div key={j} style={{border:'1px solid var(--border)',borderRadius:8}}>
                                 <button onClick={()=>onOpen({ type: 'series', seriesIndex: i, partIndex: j })} style={{width:'100%',textAlign:'left',padding:'10px 10px',background:'transparent',border:'none',display:'grid',gridTemplateColumns:'auto 1fr auto',columnGap:8,alignItems:'baseline',cursor:'pointer'}}>
                                   <span className="mono dim" style={{fontSize:12,width:20,textAlign:'right'}}>{j+1}.</span>
                                   <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.t}</span>
@@ -321,7 +400,7 @@
                   </div>
                   <div className="list" style={{marginTop:8}}>
                     {singles.map((p,i)=> (
-                      <div key={i} style={{border:'1px solid #1f1f1f',borderRadius:8}}>
+                      <div key={i} style={{border:'1px solid var(--border)',borderRadius:8}}>
                         <button onClick={()=>onOpen({ type: 'single', index: i })} style={{width:'100%',textAlign:'left',padding:'10px 10px',background:'transparent',border:'none',display:'grid',gridTemplateColumns:'1fr auto',columnGap:8,alignItems:'baseline',cursor:'pointer'}}>
                           <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.t}</span>
                           <span className="mono dim" style={{fontSize:12}}>{p.d}</span>
@@ -342,7 +421,7 @@
                     <React.Fragment key={idx}>
                       <div className="mono dim" style={{fontSize:12}}>{it.date}</div>
                       <button onClick={()=> onOpen(it.kind==='series' ? { type:'series', seriesIndex: it.seriesIndex, partIndex: it.partIndex } : { type:'single', index: it.index })} style={{textAlign:'left',background:'transparent',border:'none',padding:'6px 0',cursor:'pointer',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.title}</button>
-                      <div className="mono dim" style={{fontSize:12,textAlign:'right'}}>{it.kind==='series' ? it.seriesTitle : 'single'}</div>
+                      <div className="mono dim" style={{fontSize:12,textAlign:'right'}}>{it.kind==='series' ? 'series' : 'single'}</div>
                     </React.Fragment>
                   ))}
                 </div>
@@ -350,9 +429,9 @@
             )}
 
             <div style={{display:'flex',justifyContent:'flex-end',marginTop:16}}>
-              <div style={{display:'inline-flex',border:'1px solid #1f1f1f',borderRadius:10,overflow:'hidden'}}>
-                <button onClick={()=>setShowIndex(false)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'transparent' : '#1a1a1a',color:'#cfcfcf',cursor:'pointer'}}>series</button>
-                <button onClick={()=>setShowIndex(true)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? '#1a1a1a' : 'transparent',color:'#cfcfcf',cursor:'pointer'}}>index</button>
+              <div style={{display:'inline-flex',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}}>
+                <button onClick={()=>setShowIndex(false)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'transparent' : 'var(--toggle-active)',color:'#cfcfcf',cursor:'pointer'}}>series</button>
+                <button onClick={()=>setShowIndex(true)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'var(--toggle-active)' : 'transparent',color:'#cfcfcf',cursor:'pointer'}}>index</button>
               </div>
             </div>
           </main>
@@ -417,7 +496,7 @@
 
       function Note({ children }){
         return (
-          <div className="card" style={{ background: "#121212", borderColor: "#2a2a2a" }}>
+          <div className="card" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
             {children}
           </div>
         );
@@ -443,7 +522,7 @@
         const x = (q)=> pad + (q/100)*(width-2*pad);
         const y = (p)=> height - pad - (p/100)*(height-2*pad);
 
-        try {
+        React.useEffect(()=>{
           if (regime === 'lvt') {
             console.assert(Qs === 60, 'Qs fixed under LVT');
             console.assert(Math.abs(Pb_lvt - (a - b*Qs)) < 1e-9, 'Pb_lvt = a - b*Qs');
@@ -454,72 +533,78 @@
             console.assert(Math.abs((Pb1 - Ps1) - tax) < 1e-9, 'wedge = tax');
             console.assert(Math.abs(rev_prop - tax*Q1) < 1e-9, 'rev prop = t*Q1');
             console.assert(dwl_val >= -1e-9, 'DWL non-negative');
+            const Q1next = Math.max(0, (a - (c + (tax+2))) / (b + m));
+            console.assert(Q1next <= Q1 + 1e-9, 'Q should decrease as tax increases');
           }
-        } catch {}
+        }, [tax, regime]);
 
         return (
           <main className="wrap main">
             <h2>tax regimes in econ 101</h2>
-            <p className="dim">lvt: fixed land; no dwl. property tax: q falls; dwl in red.</p>
+            <p className="dim">lvt: fixed land; no dwl. property tax: q falls; dwl hatched.</p>
             <div style={{overflow:'visible'}}>
               <svg width={width} height={height} role="img" aria-label="Tax comparison" style={{display:'block',width:'100%',height:'auto'}}>
                 <defs>
                   <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L8,4 L0,8 z" fill="#9ca3af" />
+                    <path d="M0,0 L8,4 L0,8 z" fill="var(--label)" />
                   </marker>
+                  <pattern id="dwlHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(20)">
+                    <rect width="6" height="6" fill="var(--dwl-bg)" opacity="var(--dwl-bg-opacity)" />
+                    <line x1="0" y1="0" x2="0" y2="6" stroke="var(--dwl-stroke)" strokeWidth="1" opacity="var(--dwl-stroke-opacity)" />
+                  </pattern>
                 </defs>
-                <line x1={pad} y1={y(0)} x2={pad} y2={y(100)} stroke="#2a2a2a" />
-                <line x1={x(0)} y1={height-pad} x2={x(100)} y2={height-pad} stroke="#2a2a2a" />
-                <text x={pad-10} y={y(100)-8} fill="#8b8b8b" fontSize="10" textAnchor="end">P</text>
-                <text x={x(100)+6} y={height-pad+14} fill="#8b8b8b" fontSize="10">Q</text>
+                <line x1={pad} y1={y(0)} x2={pad} y2={y(100)} stroke="var(--axis)" />
+                <line x1={x(0)} y1={height-pad} x2={x(100)} y2={height-pad} stroke="var(--axis)" />
+                <text x={pad-10} y={y(100)-8} fill="var(--label)" fontSize="10" textAnchor="end">P</text>
+                <text x={x(100)+6} y={height-pad+14} fill="var(--label)" fontSize="10">Q</text>
 
                 {regime === 'lvt' ? (
                   <g>
-                    <rect x={x(0)} y={y(Pb_lvt)} width={x(Qs)-x(0)-2} height={y(Ps_lvt)-y(Pb_lvt)} fill="#f59e0b" opacity="0.08" />
-                    <line x1={x(0)} y1={y(a)} x2={x(100)} y2={y(a - b*100)} stroke="#a6a6a6" strokeWidth="1.6" markerEnd="url(#arrow)" />
-                    <text x={x(8)} y={y(a) - 8} fill="#9ca3af" fontSize="10">demand</text>
-                    <line x1={x(Qs)} y1={y(0)} x2={x(Qs)} y2={y(100)} stroke="#c7c7c7" strokeWidth="1.6" />
-                    <text x={x(Qs)+6} y={y(92)} fill="#9ca3af" fontSize="10">supply (fixed)</text>
-                    <circle cx={x(Qs)} cy={y(Pb_lvt)} r="3" fill="#cfcfcf" />
-                    <line x1={x(Qs)} y1={y(Ps_lvt)} x2={x(Qs)} y2={y(Pb_lvt)} stroke="#f59e0b" strokeWidth="4" opacity="0.45" />
-                    <text x={pad+10} y={y((Pb_lvt+Ps_lvt)/2)+3} fill="#9ca3af" fontSize="10">tax = {tax}</text>
-                    <line x1={x(0)} y1={y(Pb_lvt)} x2={x(Qs)} y2={y(Pb_lvt)} stroke="#3a3a3a" strokeDasharray="4 4" opacity="0.6" />
-                    <text x={pad-10} y={y(Pb_lvt)+3} fill="#8b8b8b" fontSize="10" textAnchor="end">P_b</text>
-                    <line x1={x(0)} y1={y(Ps_lvt)} x2={x(Qs)} y2={y(Ps_lvt)} stroke="#3a3a3a" strokeDasharray="4 4" opacity="0.6" />
-                    <text x={pad-10} y={y(Ps_lvt)+3} fill="#8b8b8b" fontSize="10" textAnchor="end">P_s</text>
-                    <text x={x(Qs)} y={height-pad+18} fill="#8b8b8b" fontSize="10" textAnchor="middle">Q★</text>
+                    <rect x={x(0)} y={y(Pb_lvt)} width={x(Qs)-x(0)-2} height={y(Ps_lvt)-y(Pb_lvt)} fill="var(--wedge)" opacity="0.10" />
+                    <line x1={x(0)} y1={y(a)} x2={x(100)} y2={y(a - b*100)} stroke="var(--demand)" strokeWidth="1.6" markerEnd="url(#arrow)" />
+                    <text x={x(8)} y={y(a) - 8} fill="var(--label)" fontSize="10">demand</text>
+                    <line x1={x(Qs)} y1={y(0)} x2={x(Qs)} y2={y(100)} stroke="var(--supply)" strokeWidth="1.6" />
+                    <text x={x(Qs)+6} y={y(92)} fill="var(--label)" fontSize="10">supply (fixed)</text>
+                    <circle cx={x(Qs)} cy={y(Pb_lvt)} r="3" fill="var(--point)" />
+                    <line x1={x(Qs)} y1={y(Ps_lvt)} x2={x(Qs)} y2={y(Pb_lvt)} stroke="var(--wedge)" strokeWidth="4" opacity="0.45" />
+                    <text x={pad+10} y={y((Pb_lvt+Ps_lvt)/2)+3} fill="var(--label)" fontSize="10">tax = {tax}</text>
+                    <line x1={x(0)} y1={y(Pb_lvt)} x2={x(Qs)} y2={y(Pb_lvt)} stroke="var(--grid)" strokeDasharray="4 4" opacity="0.6" />
+                    <text x={pad-10} y={y(Pb_lvt)+3} fill="var(--label)" fontSize="10" textAnchor="end">P_b</text>
+                    <line x1={x(0)} y1={y(Ps_lvt)} x2={x(Qs)} y2={y(Ps_lvt)} stroke="var(--grid)" strokeDasharray="4 4" opacity="0.6" />
+                    <text x={pad-10} y={y(Ps_lvt)+3} fill="var(--label)" fontSize="10" textAnchor="end">P_s</text>
+                    <text x={x(Qs)} y={height-pad+18} fill="var(--label)" fontSize="10" textAnchor="middle">Q★</text>
                   </g>
                 ) : (
                   <g>
-                    <polygon points={`${x(Q1)},${y(Pb1)} ${x(Q1)},${y(c + m*Q1)} ${x(Q0)},${y(P0)}`} fill="#ef4444" opacity="0.12" />
-                    <rect x={x(0)} y={y(Pb1)} width={x(Q1)-x(0)-2} height={y(Ps1)-y(Pb1)} fill="#f59e0b" opacity="0.08" />
-                    <line x1={x(0)} y1={y(a)} x2={x(100)} y2={y(a - b*100)} stroke="#a6a6a6" strokeWidth="1.6" markerEnd="url(#arrow)" />
-                    <text x={x(8)} y={y(a) - 8} fill="#9ca3af" fontSize="10">demand</text>
-                    <line x1={x(0)} y1={y(c)} x2={x(100)} y2={y(c + m*100)} stroke="#c7c7c7" strokeWidth="1.6" />
-                    <text x={x(6)} y={y(c)+12} fill="#9ca3af" fontSize="10">supply</text>
-                    <line x1={x(0)} y1={y(c+tax)} x2={x(100)} y2={y(c + tax + m*100)} stroke="#9ca3af" strokeWidth="1.2" strokeDasharray="6 4" />
-                    <text x={x(18)} y={y(c+tax)+12} fill="#9ca3af" fontSize="10">supply + tax</text>
-                    <circle cx={x(Q0)} cy={y(P0)} r="3" fill="#cfcfcf" />
-                    <circle cx={x(Q1)} cy={y(Pb1)} r="3" fill="#cfcfcf" />
-                    <line x1={x(Q1)} y1={y(Ps1)} x2={x(Q1)} y2={y(Pb1)} stroke="#f59e0b" strokeWidth="4" opacity="0.45" />
-                    <line x1={x(0)} y1={y(Pb1)} x2={x(Q1)} y2={y(Pb1)} stroke="#3a3a3a" strokeDasharray="4 4" opacity="0.6" />
-                    <text x={pad-10} y={y(Pb1)+3} fill="#8b8b8b" fontSize="10" textAnchor="end">P_b</text>
-                    <line x1={x(0)} y1={y(Ps1)} x2={x(Q1)} y2={y(Ps1)} stroke="#3a3a3a" strokeDasharray="4 4" opacity="0.6" />
-                    <text x={pad-10} y={y(Ps1)+3} fill="#8b8b8b" fontSize="10" textAnchor="end">P_s</text>
-                    <text x={(x(Q1)+x(Q1)+x(Q0))/3} y={(y(Pb1)+y(c+m*Q1)+y(P0))/3} fill="#ef4444" fontSize="10" className="mono">DWL</text>
-                    <text x={pad+10} y={y((Pb1+Ps1)/2)+3} fill="#9ca3af" fontSize="10">tax = {tax}</text>
-                    <text x={x(Q1)} y={height-pad+18} fill="#8b8b8b" fontSize="10" textAnchor="middle">Q_t</text>
-                    <text x={x(Q0)} y={height-pad+18} fill="#8b8b8b" fontSize="10" textAnchor="middle">Q₀</text>
+                    <polygon points={`${x(Q1)},${y(Pb1)} ${x(Q1)},${y(c + m*Q1)} ${x(Q0)},${y(P0)}`} fill="url(#dwlHatch)" stroke="var(--dwl-stroke)" strokeOpacity="var(--dwl-stroke-opacity)" strokeWidth="1" />
+                    <rect x={x(0)} y={y(Pb1)} width={x(Q1)-x(0)-2} height={y(Ps1)-y(Pb1)} fill="var(--wedge)" opacity="0.10" />
+                    <line x1={x(0)} y1={y(a)} x2={x(100)} y2={y(a - b*100)} stroke="var(--demand)" strokeWidth="1.6" markerEnd="url(#arrow)" />
+                    <text x={x(8)} y={y(a) - 8} fill="var(--label)" fontSize="10">demand</text>
+                    <line x1={x(0)} y1={y(c)} x2={x(100)} y2={y(c + m*100)} stroke="var(--supply)" strokeWidth="1.6" />
+                    <text x={x(6)} y={y(c)+12} fill="var(--label)" fontSize="10">supply</text>
+                    <line x1={x(0)} y1={y(c+tax)} x2={x(100)} y2={y(c + tax + m*100)} stroke="var(--supply-tax)" strokeWidth="1.2" strokeDasharray="6 4" />
+                    <text x={x(18)} y={y(c+tax)+12} fill="var(--label)" fontSize="10">supply + tax</text>
+                    <circle cx={x(Q0)} cy={y(P0)} r="3" fill="var(--point)" />
+                    <circle cx={x(Q1)} cy={y(Pb1)} r="3" fill="var(--point)" />
+                    <line x1={x(Q1)} y1={y(Ps1)} x2={x(Q1)} y2={y(Pb1)} stroke="var(--wedge)" strokeWidth="4" opacity="0.45" />
+                    <line x1={x(0)} y1={y(Pb1)} x2={x(Q1)} y2={y(Pb1)} stroke="var(--grid)" strokeDasharray="4 4" opacity="0.6" />
+                    <text x={pad-10} y={y(Pb1)+3} fill="var(--label)" fontSize="10" textAnchor="end">P_b</text>
+                    <line x1={x(0)} y1={y(Ps1)} x2={x(Q1)} y2={y(Ps1)} stroke="var(--grid)" strokeDasharray="4 4" opacity="0.6" />
+                    <text x={pad-10} y={y(Ps1)+3} fill="var(--label)" fontSize="10" textAnchor="end">P_s</text>
+                    <text x={(x(Q1)+x(Q1)+x(Q0))/3} y={(y(Pb1)+y(c+m*Q1)+y(P0))/3} fill="var(--dwl-stroke)" fontSize="10" className="mono">DWL</text>
+                    <text x={pad+10} y={y((Pb1+Ps1)/2)+3} fill="var(--label)" fontSize="10">tax = {tax}</text>
+                    <text x={x(Q1)} y={height-pad+18} fill="var(--label)" fontSize="10" textAnchor="middle">Q_t</text>
+                    <text x={x(Q0)} y={height-pad+18} fill="var(--label)" fontSize="10" textAnchor="middle">Q₀</text>
                   </g>
                 )}
               </svg>
               <div style={{display:'flex',alignItems:'center',gap:12,marginTop:12,flexWrap:'wrap'}}>
-                <div style={{display:'inline-flex',border:'1px solid #1f1f1f',borderRadius:10,overflow:'hidden'}}>
-                  <button onClick={()=>setRegime('lvt')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='lvt'?'#1a1a1a':'transparent',color:'#cfcfcf',cursor:'pointer',border:'none',outline:'none'}}>LVT</button>
-                  <button onClick={()=>setRegime('prop')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='prop'?'#1a1a1a' : 'transparent',color:'#cfcfcf',cursor:'pointer',border:'none',outline:'none'}}>property tax</button>
+                <div style={{display:'inline-flex',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}}>
+                  <button onClick={()=>setRegime('lvt')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='lvt'? 'var(--toggle-active)': 'transparent',color:'#cfcfcf',cursor:'pointer'}}>LVT</button>
+                  <button onClick={()=>setRegime('prop')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='prop'? 'var(--toggle-active)' : 'transparent',color:'#cfcfcf',cursor:'pointer'}}>property tax</button>
                 </div>
                 <span className="mono dim" style={{fontSize:12}}>tax</span>
-                <input className="slider" type="range" min={0} max={40} step={2} value={tax} onChange={e=> setTax(parseInt(e.target.value,10))} />
+                <input className="slider" type="range" min="0" max="40" step="2" value={tax} onChange={e=> setTax(parseInt(e.target.value,10))} />
                 <span className="mono" style={{opacity:.85}}>{tax}</span>
                 {regime==='lvt' ? (
                   <span className="mono dim" style={{fontSize:12}}>· revenue = {Math.round(rev_lvt)}</span>
