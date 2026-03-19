@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>joel</title>
     <meta name="color-scheme" content="dark light">
-    <style>html,body,#root{height:100%;margin:0}</style>
+    <style>
+      html, body { height: 100%; margin: 0; overflow-x: hidden; }
+      #root { height: 100%; margin: 0; }
+      
+      /* Deaktiviert global alle Browser-Fokus-Ränder und Tap-Highlights */
+      *, *:focus, *:active, *:focus-visible { 
+        outline: none !important; 
+        -webkit-tap-highlight-color: transparent; 
+      }
+    </style>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -17,11 +26,10 @@
       function App() {
         const [route, setRoute] = React.useState("home");
         const [reader, setReader] = React.useState(null);
-        const [theme, setTheme] = React.useState('mint'); // default: mint
+        const [theme, setTheme] = React.useState('mint');
 
         React.useEffect(()=>{ document.title = "joel"; }, []);
 
-        // --- URL state (hash) ---
         const buildHash = (r, rd) => {
           if (r === 'writings' && rd) {
             if (rd.type === 'series') return '#/writings/series/' + rd.seriesIndex + '/' + rd.partIndex;
@@ -116,20 +124,30 @@
           }
         };
 
+        const toggleTheme = () => {
+          setTheme(t => {
+            if (t === 'mint') return 'dark';
+            if (t === 'dark') return 'light';
+            return 'mint';
+          });
+        };
+
         const css = `
           html, body, #root { height: 100%; margin: 0; background:var(--bg); }
           :root { color-scheme: dark; }
-          .theme-dark { --bg:#000; --text:#e5e5e5; --dim:#9ca3af; --border:#121212; --card-bg:#060606; --nav-bg: rgba(0,0,0,0.5); --footer-border:#0a0a0a; --slider-track:#0a0a0a; --slider-hover:#141414; --thumb-bg:#8a8a8a; --thumb-border:#1a1a1a; --toggle-active:#1a1a1a; --axis:#101010; --demand:#9e9e9e; --supply:#8f8f8f; --supply-tax:#8a9199; --wedge:#b98a1e; --grid:#1a1a1a; --point:#bdbdbd; --label:#9ca3af; --dwl-bg:#5c2f2f; --dwl-stroke:#c28a8a; --dwl-stroke-opacity:0.35; --dwl-bg-opacity:0.10; --chip-bg:#0a0a0a; }
-          .theme-mint { --bg:#061a16; --text:#e5e5e5; --dim:#9dcab9; --border:#14352e; --card-bg:#0b221d; --nav-bg: rgba(6,26,22,0.55); --footer-border:#14352e; --slider-track:#13332b; --slider-hover:#184038; --thumb-bg:#a9e9d4; --thumb-border:#1f5a4e; --toggle-active:#163a33; --axis:#14352e; --demand:#aeead8; --supply:#7fd1b7; --supply-tax:#9dcab9; --wedge:#30d5b0; --grid:#1a1a3e36; --point:#cfeee4; --label:#9dcab9; --dwl-bg:#19473e; --dwl-stroke:#82d9c2; --dwl-stroke-opacity:0.30; --dwl-bg-opacity:0.12; --chip-bg:#102e28; }
+          .theme-dark { --bg:#000; --text:#e5e5e5; --dim:#9ca3af; --border:#121212; --card-bg:#060606; --nav-bg: rgba(0,0,0,0.5); --footer-border:#0a0a0a; --slider-track:#0a0a0a; --slider-hover:#141414; --thumb-bg:#8a8a8a; --thumb-border:#1a1a1a; --toggle-active:#1a1a1a; --axis:#101010; --demand:#9e9e9e; --supply:#8f8f8f; --supply-tax:#8a9199; --wedge:#b98a1e; --grid:#1a1a1a; --point:#bdbdbd; --label:#9ca3af; --dwl-bg:#5c2f2f; --dwl-stroke:#c28a8a; --dwl-stroke-opacity:0.35; --dwl-bg-opacity:0.10; --chip-bg:#0a0a0a; --book-blur: blur(5px); --book-border: rgba(255,255,255,0.1); --book-title-color: rgba(210,190,160,0.65); --book-active-border: rgba(255,255,255,0.4); --book-shadow: inset 2px 0 4px rgba(255,255,255,0.04); --book-active-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 2px 0 4px rgba(255,255,255,0.15); }
+          .theme-mint { --bg:#061a16; --text:#e5e5e5; --dim:#9dcab9; --border:#14352e; --card-bg:#0b221d; --nav-bg: rgba(6,26,22,0.55); --footer-border:#14352e; --slider-track:#13332b; --slider-hover:#184038; --thumb-bg:#a9e9d4; --thumb-border:#1f5a4e; --toggle-active:#163a33; --axis:#14352e; --demand:#aeead8; --supply:#7fd1b7; --supply-tax:#9dcab9; --wedge:#30d5b0; --grid:#1a1a3e36; --point:#cfeee4; --label:#9dcab9; --dwl-bg:#19473e; --dwl-stroke:#82d9c2; --dwl-stroke-opacity:0.30; --dwl-bg-opacity:0.12; --chip-bg:#102e28; --book-blur: blur(5px); --book-border: rgba(255,255,255,0.1); --book-title-color: rgba(210,190,160,0.65); --book-active-border: rgba(255,255,255,0.4); --book-shadow: inset 2px 0 4px rgba(255,255,255,0.04); --book-active-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 2px 0 4px rgba(255,255,255,0.15); }
+          .theme-light { --bg:#f4f1ea; --text:#2c2c2c; --dim:#827f79; --border:#e4dfd5; --card-bg:#fbf9f5; --nav-bg: rgba(244,241,234,0.65); --footer-border:#e4dfd5; --slider-track:#e4dfd5; --slider-hover:#d6d0c4; --thumb-bg:#fbf9f5; --thumb-border:#b8b2a5; --toggle-active:#e4dfd5; --axis:#d6d0c4; --demand:#6b8e7e; --supply:#5e7a8a; --supply-tax:#8a99a4; --wedge:#c89446; --grid:rgba(0,0,0,0.06); --point:#2c2c2c; --label:#827f79; --dwl-bg:#d9c5c5; --dwl-stroke:#b37d7d; --dwl-stroke-opacity:0.4; --dwl-bg-opacity:0.25; --chip-bg:#f4f1ea; --book-blur: none; --book-border: rgba(0,0,0,0.15); --book-title-color: rgba(0,0,0,0.6); --book-active-border: rgba(0,0,0,0.4); --book-shadow: inset 2px 0 4px rgba(0,0,0,0.08); --book-active-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 2px 0 4px rgba(0,0,0,0.1); }
+          
+          .theme-light { color-scheme: light; }
           button { -webkit-appearance:none; appearance:none; border:0; background:transparent; color:inherit; font:inherit; }
           button:focus { outline:none; }
-          button:focus-visible { outline:2px solid #2a2a2a; outline-offset:2px; border-radius:8px; }
           a { color: inherit; }
           .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
           .nav { position: sticky; top: 0; background: var(--nav-bg); backdrop-filter: saturate(1.1) blur(10px) contrast(0.95); border-bottom: 1px solid var(--footer-border); z-index: 10; }
           .nav-inner { height: 64px; display: flex; align-items: center; justify-content: space-between; }
           .title { font-weight: 700; letter-spacing: -0.02em; }
-          .title.joel { position: relative; display: inline-flex; align-items: flex-end; gap: 0; color: #e5e5e5; line-height: 1; letter-spacing: -0.02em; cursor:pointer; }
+          .title.joel { position: relative; display: inline-flex; align-items: flex-end; gap: 0; color: var(--text); line-height: 1; letter-spacing: -0.02em; cursor:pointer; }
           .j-pad { display:inline-block; width:0.12em; }
           .logo { display:inline-flex; align-items:flex-end; margin-right:-0.30em; transform: translateY(0.20em); }
           .logo svg { height:1.05em; width:auto; display:block; overflow:visible; }
@@ -137,13 +155,13 @@
           .logo-dot { transition: transform .25s cubic-bezier(.2,.7,.2,1.2); transform-origin:center; }
           .title.joel:hover .logo-dot { transform: translateY(-15%); }
           .tabs { display: flex; gap: 16px; }
-          .tab { padding: 8px 0; border: none; border-radius: 0; background: transparent; color: #bbb; font-size: 13px; cursor: pointer; }
-          .tab:hover { color: #fff; }
-          .tab.active { color: #fff; }
+          .tab { padding: 8px 0; border: none; border-radius: 0; background: transparent; color: var(--dim); font-size: 13px; cursor: pointer; transition: color 0.2s; }
+          .tab:hover { color: var(--text); }
+          .tab.active { color: var(--text); }
           .main { padding-top: 28px; padding-bottom: 72px; }
           h1 { font-size: 52px; line-height: 1.05; margin: 0 0 12px 0; letter-spacing: -0.02em; }
           h2 { font-size: 28px; margin: 0 0 12px 0; }
-          p { margin: 12px 0; color: #c9c9c9; }
+          p { color: var(--text); }
           .dim { color: var(--dim); }
           .list { display: grid; gap: 12px; }
           .card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--card-bg); }
@@ -154,13 +172,145 @@
           .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--thumb-bg); border: 1px solid var(--thumb-border); box-shadow: none; transition: background .2s, transform .1s; }
           .slider:hover::-webkit-slider-thumb { filter: brightness(1.1); }
           .slider:active::-webkit-slider-thumb { transform: scale(1.05); }
-          /* Scroll cue and reveal */
           .scroll-cue { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--dim); font-size:12px; opacity:.85; margin: 18px 0 12px; }
           .chev { display:inline-block; }
           @keyframes bob { 0%{ transform: translateY(0);} 50%{ transform: translateY(4px);} 100%{ transform: translateY(0);} }
           .chev svg { animation: bob 1.8s ease-in-out infinite; }
           .reveal { opacity:0; transform: translateY(24px); transition: opacity 1.2s ease, transform 1.2s ease; transition-delay: .15s; }
           .reveal.visible { opacity:1; transform:none; }
+          
+          /* Bookshelf Layout & Viewport */
+          .shelf-viewport {
+            position: relative;
+            width: 100vw; 
+            max-width: 1100px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          
+          .shelf-wrapper { 
+            width: calc(100% - 100px); 
+            margin: 0 auto;
+            padding: 40px 0 20px 0; 
+            display: flex; 
+            overflow-x: auto; 
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth; 
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            transform: translateZ(0); 
+          }
+          .shelf-wrapper::-webkit-scrollbar { display: none; width: 0; height: 0; }
+          
+          .shelf-nav-btn {
+            position: absolute;
+            top: calc(50% + 10px);
+            transform: translateY(-50%);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(120, 120, 120, 0.15);
+            border: 1px solid rgba(120, 120, 120, 0.2);
+            color: var(--text);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 100;
+            opacity: 0.6; transition: opacity 0.2s, background 0.2s;
+            backdrop-filter: blur(8px);
+          }
+          .shelf-nav-btn:hover {
+            opacity: 1; background: rgba(120, 120, 120, 0.25);
+          }
+          .shelf-nav-btn.left { left: 0px; }
+          .shelf-nav-btn.right { right: 0px; }
+
+          .shelf-container { 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 2px; 
+            padding: 0 64px; 
+            min-width: max-content; 
+            margin: 0 auto; 
+          }
+          
+          .book { 
+            border: 1px solid var(--book-border); 
+            border-radius: 1px; 
+            backdrop-filter: var(--book-blur); 
+            -webkit-backdrop-filter: var(--book-blur); 
+            transform-origin: bottom center; 
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            box-shadow: var(--book-shadow); 
+            transform: perspective(1000px) translateZ(0) rotateX(0deg); 
+          }
+          .book-title { 
+            writing-mode: vertical-rl; 
+            font-family: ui-sans-serif, system-ui, sans-serif; 
+            font-size: 10px; 
+            letter-spacing: 2px; 
+            color: var(--book-title-color); 
+            text-transform: uppercase; 
+            pointer-events: none; 
+          }
+          .shelf-container:not(.has-active) .book:hover { 
+            filter: brightness(1.2) saturate(1.1); 
+            transform: perspective(1000px) translateZ(40px) rotateX(-8deg); 
+          }
+
+          .shelf-container.has-active .book:not(.active) {
+            filter: brightness(0.4) saturate(0.5);
+            transform: perspective(1000px) translateZ(-20px);
+          }
+          .shelf-container.has-active .book:hover:not(.active) {
+            filter: brightness(0.7);
+            transform: perspective(1000px) translateZ(0px) rotateX(-5deg);
+          }
+          .book.active {
+            transform: perspective(1000px) translateZ(60px) translateY(10px) rotateX(-5deg);
+            filter: brightness(1.3) saturate(1.1);
+            z-index: 10;
+            border-color: var(--book-active-border);
+            box-shadow: var(--book-active-shadow);
+          }
+
+          .book-take-panel {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+          }
+          .book-take-panel.open {
+            grid-template-rows: 1fr;
+          }
+          .book-take-inner {
+            overflow: hidden;
+            min-height: 0;
+            padding: 0 16px;
+          }
+          .book-take-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0 32px 0;
+            width: 100%;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
+          }
+          .book-take-panel.open .book-take-content {
+            opacity: 1;
+            transform: translateY(0);
+          }
         `;
 
         React.useEffect(() => {
@@ -172,7 +322,7 @@
         }, [route]);
 
         return (
-          <div className={theme==='mint' ? 'theme-mint' : 'theme-dark'} style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif" }}>
+          <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif", transition: "background 0.3s, color 0.3s" }}>
             <style>{css}</style>
 
             <div className="nav">
@@ -180,10 +330,10 @@
                 <div
                   className="title joel"
                   aria-label="joel"
-                  onClick={()=> setTheme(t=> t==='dark'?'mint':'dark')}
+                  onClick={toggleTheme}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); setTheme(t=> t==='dark'?'mint':'dark'); }}}
+                  onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleTheme(); }}}
                 >
                   <span className="j-pad" aria-hidden="true">&nbsp;</span>
                   <span className="logo" aria-hidden="true">
@@ -232,12 +382,16 @@
           <>
             <main className="wrap main" style={{minHeight:'75vh'}}>
               <h1>hi.</h1>
-              <p>i'm joel.</p>
-              <p>i study law & economics (and a little philosophy).</p>
-              <p>during my undergrad, i focused on efficient markets, corporate law, and the philosophical foundations of legal entities (ltd, gmbh).</p>
-              <p>here, i explore ideas in different fields and share what interests me.</p>
-              <p className="dim">you can find me on <a className="link" href="https://x.com/foenus" target="_blank" rel="noreferrer">x</a>.</p>
-              <Note>note: this site is new. i'll keep adding little essays and project notes.</Note>
+              <p style={{ margin: '0 0 12px 0' }}>i'm joel.</p>
+              <p style={{ margin: '0 0 2px 0' }}>i study law & economics (and a little philosophy).</p>
+              <p style={{ margin: '0' }}>here, i explore ideas in different fields and share what interests me.</p>
+              
+              <p className="dim" style={{ margin: '56px 0 0 0' }}>you can find me on <a className="link" href="https://x.com/foenus" target="_blank" rel="noreferrer">x</a>.</p>
+              
+              <div style={{ marginTop: '56px' }}>
+                <Note>note: this site is new. i'll keep adding to it in the future.</Note>
+              </div>
+              
               <div className="scroll-cue">
                 <span className="chev" aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="var(--dim)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -248,6 +402,117 @@
               <LandTaxChartDemo />
             </div>
           </>
+        );
+      }
+
+      function BookShelf() {
+        const [activeIndex, setActiveIndex] = React.useState(null);
+        const scrollRef = React.useRef(null);
+
+        React.useEffect(() => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollLeft = 200;
+          }
+        }, []);
+
+        const handleScroll = (amount) => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+          }
+        };
+
+        const colorPalette = [
+          "rgba(145, 65, 75, 0.8)",   // Dunkelrot, gedämpft
+          "rgba(65, 115, 85, 0.8)",   // Dunkelgrün, gedämpft
+          "rgba(110, 110, 110, 0.8)", // Echtes Grau
+          "rgba(80, 80, 80, 0.8)",    // Echtes Dunkelgrau
+          "rgba(125, 95, 70, 0.8)",   // Gedämpftes Braun
+          "rgba(165, 105, 65, 0.8)",  // Rostorange
+          "rgba(75, 100, 120, 0.8)"   // Graublau
+        ];
+
+        const baseData = [
+          { title: "Fiction", author: "Autor A" },
+          { title: "History", author: "Autor B" },
+          { title: "Non-Fiction", author: "Autor C" },
+          { title: "Crime", author: "Autor D" },
+          { title: "Poetry", author: "Autor E" }
+        ];
+
+        const books = React.useMemo(() => {
+          return Array.from({ length: 80 }).map((_, i) => {
+            const base = baseData[i % 5];
+            
+            const colorIndex = Math.floor(Math.abs(Math.sin(i * 1.5)) * colorPalette.length);
+            const color = colorPalette[colorIndex];
+            
+            const height = 190 + (Math.abs(Math.sin(i * 7.13)) * 60); 
+            const width = 22 + (Math.abs(Math.cos(i * 3.14)) * 4); 
+
+            return {
+              ...base,
+              color,
+              height,
+              width,
+              take: `Gedanken und Notizen zu ${base.title}. Die inhaltliche Tiefe variiert, aber der analytische Ansatz im mittleren Segment ist bemerkenswert.`
+            };
+          });
+        }, []);
+
+        const activeBook = activeIndex !== null ? books[activeIndex] : null;
+
+        return (
+          <div style={{ marginBottom: '12px' }}>
+            <div className="shelf-viewport">
+              <button className="shelf-nav-btn left" onClick={() => handleScroll(-400)} aria-label="Scroll left">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              
+              <div className="shelf-wrapper" ref={scrollRef}>
+                <div className={`shelf-container ${activeIndex !== null ? 'has-active' : ''}`}>
+                  {books.map((book, i) => (
+                    <div 
+                      key={i} 
+                      className={`book ${activeIndex === i ? 'active' : ''}`} 
+                      style={{ height: book.height, width: book.width, backgroundColor: book.color }}
+                      onClick={() => setActiveIndex(activeIndex === i ? null : i)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <span className="book-title">{book.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <button className="shelf-nav-btn right" onClick={() => handleScroll(400)} aria-label="Scroll right">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+            
+            <div className={`book-take-panel ${activeIndex !== null ? 'open' : ''}`}>
+              <div className="book-take-inner">
+                <div className="book-take-content">
+                  {activeBook && (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: 22, letterSpacing: '-0.01em' }}>{activeBook.title}</h3>
+                          <div className="mono dim" style={{ fontSize: 12, marginTop: 4 }}>{activeBook.author}</div>
+                        </div>
+                        <button onClick={() => setActiveIndex(null)} className="mono dim" style={{ fontSize: 12, padding: '4px 8px', border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer', background: 'transparent' }}>
+                          close
+                        </button>
+                      </div>
+                      <div style={{ marginTop: 20, fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>
+                        <p style={{ color: 'inherit' }}>{activeBook.take}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         );
       }
 
@@ -268,19 +533,20 @@
         return (
           <main className="wrap main">
             <h2>reading</h2>
-            <p className="dim">a shelf to store ideas worth exploring.</p>
+            <p className="dim" style={{marginTop: -4, marginBottom: 24}}>sharing books i like, and encouraging myself to read.</p>
+            
+            <BookShelf />
+
             <div className="list" style={{marginTop:12}}>
               <div className="card">
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
                   <div style={{fontWeight:600}}>papers</div>
-                  <div className="mono dim" style={{fontSize:12}}>muster</div>
                 </div>
                 <div className="list" style={{marginTop:8}}>
                   {placeholders.map((ph,i)=> (
                     <div key={i} style={{border:'1px dashed var(--border)',borderRadius:10,padding:'10px 12px',background:'var(--card-bg)'}}>
                       <div style={{display:'flex',justifyContent:'space-between',gap:8}}>
                         <span style={{opacity:.9}}>add paper #{i+1}</span>
-                        <span className="mono dim" style={{fontSize:12}}>{ph.hint}</span>
                       </div>
                     </div>
                   ))}
@@ -289,7 +555,6 @@
               <div className="card">
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
                   <div style={{fontWeight:600}}>themes</div>
-                  <div className="mono dim" style={{fontSize:12}}>edit later</div>
                 </div>
                 <div style={{display:'flex',flexWrap:'wrap',gap:8,marginTop:8}}>
                   {themes.map((t,i)=> (
@@ -300,13 +565,11 @@
               <div className="card">
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
                   <div style={{fontWeight:600}}>people</div>
-                  <div className="mono dim" style={{fontSize:12}}>examples</div>
                 </div>
                 <div className="list" style={{marginTop:8}}>
                   {people.map((n,i)=> (
                     <div key={i} style={{display:'flex',justifyContent:'space-between',gap:8}}>
                       <span>{n}</span>
-                      <span className="dim" style={{fontSize:13}}>add why relevant</span>
                     </div>
                   ))}
                 </div>
@@ -362,7 +625,6 @@
                 <div className="card">
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
                     <div style={{fontWeight:600}}>series</div>
-                    <div className="mono dim" style={{fontSize:12}}>muster</div>
                   </div>
                   <div className="list" style={{marginTop:8}}>
                     {series.map((s,i)=> (
@@ -396,7 +658,6 @@
                 <div className="card">
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
                     <div style={{fontWeight:600}}>single essays</div>
-                    <div className="mono dim" style={{fontSize:12}}>muster</div>
                   </div>
                   <div className="list" style={{marginTop:8}}>
                     {singles.map((p,i)=> (
@@ -430,8 +691,8 @@
 
             <div style={{display:'flex',justifyContent:'flex-end',marginTop:16}}>
               <div style={{display:'inline-flex',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}}>
-                <button onClick={()=>setShowIndex(false)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'transparent' : 'var(--toggle-active)',color:'#cfcfcf',cursor:'pointer'}}>series</button>
-                <button onClick={()=>setShowIndex(true)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'var(--toggle-active)' : 'transparent',color:'#cfcfcf',cursor:'pointer'}}>index</button>
+                <button onClick={()=>setShowIndex(false)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'transparent' : 'var(--toggle-active)',color:'var(--text)',cursor:'pointer'}}>series</button>
+                <button onClick={()=>setShowIndex(true)} className="mono" style={{fontSize:12,padding:'6px 10px',background: showIndex ? 'var(--toggle-active)' : 'transparent',color:'var(--text)',cursor:'pointer'}}>index</button>
               </div>
             </div>
           </main>
@@ -466,17 +727,17 @@
         return (
           <main className="wrap main">
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
-              <button onClick={onClose} className="mono" style={{fontSize:12,padding:'6px 10px',border:'1px solid #1f1f1f',borderRadius:8,background:'transparent',color:'#cfcfcf',cursor:'pointer'}}>← back</button>
+              <button onClick={onClose} className="mono" style={{fontSize:12,padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent',color:'var(--text)',cursor:'pointer'}}>← back</button>
               <div style={{display:'flex',alignItems:'center',gap:12}}>
                 <span className="mono dim" style={{fontSize:12}}>{data.series ? data.series : 'essay'}</span>
                 {nextInfo && (
-                  <button onClick={goNext} className="mono" style={{fontSize:12,padding:'6px 10px',border:'1px solid #1f1f1f',borderRadius:8,background:'transparent',color:'#cfcfcf',cursor:'pointer'}}>next →</button>
+                  <button onClick={goNext} className="mono" style={{fontSize:12,padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent',color:'var(--text)',cursor:'pointer'}}>next →</button>
                 )}
               </div>
             </div>
             <h2 style={{fontSize:34, letterSpacing:'-0.01em', marginTop:12}}>{data.title}</h2>
             <div className="mono dim" style={{fontSize:12, marginTop:4}}>{data.date}</div>
-            <article style={{maxWidth:'72ch', marginTop:16, fontSize:18, lineHeight:1.7, color:'#d6d6d6'}}>
+            <article style={{maxWidth:'72ch', marginTop:16, fontSize:18, lineHeight:1.7, color:'var(--text)'}}>
               <p className="dim">{data.blurb}</p>
               <p>[draft placeholder] add content here.</p>
             </article>
@@ -600,8 +861,8 @@
               </svg>
               <div style={{display:'flex',alignItems:'center',gap:12,marginTop:12,flexWrap:'wrap'}}>
                 <div style={{display:'inline-flex',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}}>
-                  <button onClick={()=>setRegime('lvt')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='lvt'? 'var(--toggle-active)': 'transparent',color:'#cfcfcf',cursor:'pointer'}}>LVT</button>
-                  <button onClick={()=>setRegime('prop')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='prop'? 'var(--toggle-active)' : 'transparent',color:'#cfcfcf',cursor:'pointer'}}>property tax</button>
+                  <button onClick={()=>setRegime('lvt')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='lvt'? 'var(--toggle-active)': 'transparent',color:'var(--text)',cursor:'pointer'}}>LVT</button>
+                  <button onClick={()=>setRegime('prop')} className="mono" style={{fontSize:12,padding:'6px 10px',background: regime==='prop'? 'var(--toggle-active)' : 'transparent',color:'var(--text)',cursor:'pointer'}}>property tax</button>
                 </div>
                 <span className="mono dim" style={{fontSize:12}}>tax</span>
                 <input className="slider" type="range" min="0" max="40" step="2" value={tax} onChange={e=> setTax(parseInt(e.target.value,10))} />
